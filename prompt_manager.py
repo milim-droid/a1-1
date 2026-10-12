@@ -163,12 +163,42 @@ def search_prompt():
     print(f"\n{len(found)}개의 프롬프트를 찾았습니다.")
 
 
+def ask_prompt_number():
+    """번호를 입력받아 prompts의 인덱스를 반환한다. 잘못되면 None."""
+    number = read_int("프롬프트 번호 입력: ")
+    if number is None or not 1 <= number <= len(prompts):
+        print(f"잘못된 번호입니다. 1~{len(prompts)} 사이의 번호를 입력해주세요.")
+        return None
+    return number - 1
+
+
+def show_detail():
+    print("\n=== 프롬프트 상세 보기 ===")
+    if not prompts:
+        print("등록된 프롬프트가 없습니다.")
+        return
+    index = ask_prompt_number()
+    if index is None:
+        return
+    prompt = prompts[index]
+    line = "─" * 28
+    print(f"\n{line}")
+    print(f"제목: {prompt['title']}")
+    print(f"카테고리: {prompt['category']}")
+    print(f"즐겨찾기: {'⭐' if prompt['favorite'] else '-'}")
+    print(line)
+    print("내용:")
+    print(prompt["content"])
+    print(line)
+
+
 def main():
     handlers = {
         "1": add_prompt,
         "2": show_list,
         "3": show_by_category,
         "4": search_prompt,
+        "5": show_detail,
     }
     while True:
         show_menu()
