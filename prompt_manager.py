@@ -192,6 +192,20 @@ def show_detail():
     print(line)
 
 
+def toggle_favorite():
+    print("\n=== 즐겨찾기 관리 ===")
+    if not prompts:
+        print("등록된 프롬프트가 없습니다.")
+        return
+    index = ask_prompt_number()
+    if index is None:
+        return
+    prompt = prompts[index]
+    prompt["favorite"] = not prompt["favorite"]
+    action = "추가" if prompt["favorite"] else "해제"
+    print(f"'{prompt['title']}' 프롬프트를 즐겨찾기에서 {action}했습니다!")
+
+
 def main():
     handlers = {
         "1": add_prompt,
@@ -199,6 +213,7 @@ def main():
         "3": show_by_category,
         "4": search_prompt,
         "5": show_detail,
+        "6": toggle_favorite,
     }
     while True:
         show_menu()
