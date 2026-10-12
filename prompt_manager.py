@@ -112,9 +112,26 @@ def add_prompt():
     print("프롬프트가 추가되었습니다!")
 
 
+def format_line(number, prompt, with_category=True):
+    star = " ⭐" if prompt["favorite"] else ""
+    prefix = f"[{prompt['category']}] " if with_category else ""
+    return f"{number}. {prefix}{prompt['title']}{star}"
+
+
+def show_list():
+    print("\n=== 프롬프트 목록 ===")
+    if not prompts:
+        print("등록된 프롬프트가 없습니다. 먼저 프롬프트를 추가해주세요.")
+        return
+    for number, prompt in enumerate(prompts, 1):
+        print(format_line(number, prompt))
+    print(f"\n총 {len(prompts)}개의 프롬프트")
+
+
 def main():
     handlers = {
         "1": add_prompt,
+        "2": show_list,
     }
     while True:
         show_menu()
