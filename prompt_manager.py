@@ -84,8 +84,38 @@ def show_menu():
     print("0. 종료")
 
 
+def choose_category():
+    """미리 정의된 목록에서 고르거나 직접 입력한 카테고리를 반환한다."""
+    while True:
+        for i, name in enumerate(CATEGORIES, 1):
+            print(f"{i}) {name}")
+        raw = input("선택 (번호 또는 직접 입력): ").strip()
+        if not raw:
+            print("입력값이 비어 있습니다. 다시 입력해주세요.")
+        elif raw.isdigit():
+            if 1 <= int(raw) <= len(CATEGORIES):
+                return CATEGORIES[int(raw) - 1]
+            print("목록에 없는 번호입니다.")
+        else:
+            return raw
+
+
+def add_prompt():
+    print("\n=== 프롬프트 추가 ===")
+    title = read_nonempty("제목: ")
+    content = read_nonempty("내용: ")
+    print("\n카테고리 선택:")
+    category = choose_category()
+    prompts.append(
+        {"title": title, "content": content, "category": category, "favorite": False}
+    )
+    print("프롬프트가 추가되었습니다!")
+
+
 def main():
-    handlers = {}  # 이후 커밋에서 기능이 추가될 때마다 채워진다
+    handlers = {
+        "1": add_prompt,
+    }
     while True:
         show_menu()
         choice = input("선택: ").strip()
