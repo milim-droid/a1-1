@@ -53,3 +53,51 @@ prompts = [
         "favorite": False,
     },
 ]
+
+
+def read_nonempty(label):
+    """빈 입력이 아닐 때까지 반복해서 입력을 받는다."""
+    while True:
+        value = input(label).strip()
+        if value:
+            return value
+        print("입력값이 비어 있습니다. 다시 입력해주세요.")
+
+
+def read_int(label):
+    """정수가 입력될 때까지 반복한다. 변환 실패 시 None을 반환한다."""
+    try:
+        return int(input(label).strip())
+    except ValueError:
+        return None
+
+
+def show_menu():
+    print("\n=== 나만의 프롬프트 관리 ===")
+    print("1. 프롬프트 추가")
+    print("2. 프롬프트 목록")
+    print("3. 카테고리별 조회")
+    print("4. 프롬프트 검색")
+    print("5. 프롬프트 상세 보기")
+    print("6. 즐겨찾기 관리")
+    print("7. 즐겨찾기 목록")
+    print("0. 종료")
+
+
+def main():
+    handlers = {}  # 이후 커밋에서 기능이 추가될 때마다 채워진다
+    while True:
+        show_menu()
+        choice = input("선택: ").strip()
+        if choice == "0":
+            print("프로그램을 종료합니다. 안녕히 가세요!")
+            break
+        handler = handlers.get(choice)
+        if handler is None:
+            print("잘못된 입력입니다. 메뉴에 있는 번호를 입력해주세요.")
+            continue
+        handler()
+
+
+if __name__ == "__main__":
+    main()
