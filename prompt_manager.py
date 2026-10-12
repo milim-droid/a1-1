@@ -64,12 +64,13 @@ def read_nonempty(label):
         print("입력값이 비어 있습니다. 다시 입력해주세요.")
 
 
-def read_int(label):
-    """정수가 입력될 때까지 반복한다. 변환 실패 시 None을 반환한다."""
-    try:
-        return int(input(label).strip())
-    except ValueError:
+def read_number(label, low, high):
+    """low~high 범위의 정수를 입력받는다. 잘못되면 안내 후 None을 반환한다."""
+    raw = input(label).strip()
+    if not raw.isdigit() or not low <= int(raw) <= high:
+        print(f"잘못된 입력입니다. {low}~{high} 사이의 번호를 입력해주세요.")
         return None
+    return int(raw)
 
 
 def show_menu():
@@ -85,19 +86,18 @@ def show_menu():
 
 
 def choose_category():
-    """미리 정의된 목록에서 고르거나 직접 입력한 카테고리를 반환한다."""
+    """목록에서 고르거나 '직접 입력'을 선택해 카테고리를 반환한다."""
+    custom = len(CATEGORIES) + 1
     while True:
         for i, name in enumerate(CATEGORIES, 1):
             print(f"{i}) {name}")
-        raw = input("선택 (번호 또는 직접 입력): ").strip()
-        if not raw:
-            print("입력값이 비어 있습니다. 다시 입력해주세요.")
-        elif raw.isdigit():
-            if 1 <= int(raw) <= len(CATEGORIES):
-                return CATEGORIES[int(raw) - 1]
-            print("목록에 없는 번호입니다.")
-        else:
-            return raw
+        print(f"{custom}) 직접 입력")
+        number = read_number("선택: ", 1, custom)
+        if number is None:
+            continue
+        if number == custom:
+            return read_nonempty("카테고리 이름: ")
+        return CATEGORIES[number - 1]
 
 
 def add_prompt():
@@ -132,17 +132,16 @@ def show_by_category():
     print("\n=== 카테고리별 조회 ===")
     for i, name in enumerate(CATEGORIES, 1):
         print(f"{i}) {name}")
-    number = read_int("선택: ")
-    if number is None or not 1 <= number <= len(CATEGORIES):
-        print("잘못된 선택입니다.")
+    number = read_number("선택: ", 1, len(CATEGORIES))
+    if number is None:
         return
     category = CATEGORIES[number - 1]
-    found = [p for p in prompts if p["category"] == category]
+    found = [(i, p) for i, p in enumerate(prompts, 1) if p["category"] == category]
     print(f"\n[{category}] 카테고리 프롬프트:")
     if not found:
         print("해당 카테고리에 등록된 프롬프트가 없습니다.")
         return
-    for i, prompt in enumerate(found, 1):
+    for i, prompt in found:
         print(format_line(i, prompt, with_category=False))
     print(f"\n총 {len(found)}개의 프롬프트")
 
@@ -151,25 +150,22 @@ def search_prompt():
     print("\n=== 프롬프트 검색 ===")
     keyword = read_nonempty("검색어: ").lower()
     found = [
-        p for p in prompts
+        (i, p) for i, p in enumerate(prompts, 1)
         if keyword in p["title"].lower() or keyword in p["content"].lower()
     ]
     if not found:
         print("검색 결과가 없습니다.")
         return
     print("\n검색 결과:")
-    for i, prompt in enumerate(found, 1):
+    for i, prompt in found:
         print(format_line(i, prompt))
     print(f"\n{len(found)}개의 프롬프트를 찾았습니다.")
 
 
 def ask_prompt_number():
     """번호를 입력받아 prompts의 인덱스를 반환한다. 잘못되면 None."""
-    number = read_int("프롬프트 번호 입력: ")
-    if number is None or not 1 <= number <= len(prompts):
-        print(f"잘못된 번호입니다. 1~{len(prompts)} 사이의 번호를 입력해주세요.")
-        return None
-    return number - 1
+    number = read_number("프롬프트 번호 입력: ", 1, len(prompts))
+    return None if number is None else number - 1
 
 
 def show_detail():
@@ -202,17 +198,19 @@ def toggle_favorite():
         return
     prompt = prompts[index]
     prompt["favorite"] = not prompt["favorite"]
-    action = "추가" if prompt["favorite"] else "해제"
-    print(f"'{prompt['title']}' 프롬프트를 즐겨찾기에서 {action}했습니다!")
+    if prompt["favorite"]:
+        print(f"'{prompt['title']}' 프롬프트를 즐겨찾기에 추가했습니다!")
+    else:
+        print(f"'{prompt['title']}' 프롬프트를 즐겨찾기에서 해제했습니다!")
 
 
 def show_favorites():
     print("\n=== 즐겨찾기 목록 ===")
-    favorites = [p for p in prompts if p["favorite"]]
+    favorites = [(i, p) for i, p in enumerate(prompts, 1) if p["favorite"]]
     if not favorites:
         print("즐겨찾기한 프롬프트가 없습니다.")
         return
-    for i, prompt in enumerate(favorites, 1):
+    for i, prompt in favorites:
         print(format_line(i, prompt))
     print(f"\n총 {len(favorites)}개의 즐겨찾기")
 
